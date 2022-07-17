@@ -3,15 +3,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 
-int PORT = 8000;
+int PORT = 4444;
 
 bool COMPRESS = false;
 bool LOG_SAVE = false;
 bool SEND_OR_RECEIVE = false; // false for send and true for receive
 
 char LOG_NAME[100];
-char* HOST = "localhost";
+char* HOST = "127.000.000.001";
 
 void print_help(char* argv[]) {
     printf("\nClient-side script to interact with server terminal!\n\n\t"
@@ -116,24 +120,44 @@ int main(int argc, char* argv[]) {
            LOG_SAVE ? "Yes" : "No",
            LOG_NAME);
 
+    int clientSocket;
+	struct sockaddr_in serverAddr;
+
+	clientSocket = socket(PF_INET, SOCK_STREAM, 0);
+	printf("\033[34m[+]Client Socket Created Successfully.\n");
+
+	memset(&serverAddr, '\0', sizeof(serverAddr));
+	serverAddr.sin_family = AF_INET;
+	serverAddr.sin_port = htons(PORT);
+	serverAddr.sin_addr.s_addr = inet_addr(HOST);
+
+    connect(clientSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
+    printf("[+]Connected to Server.\n\033[0m");
+
     while (1) {
         SEND_OR_RECEIVE = false;
 
         printf("\033[32m> ");
 
-        char user_command[100];
+        char user_command[1024];
+	    char output[1024];
 
-        fgets(user_command, 100, stdin);
-
+        fgets(user_command, 1024, stdin);
         user_command[strcspn(user_command, "\n")] = 0;
 
+    	int command_size = strlen(user_command);
+
+        send(clientSocket, user_command, command_size, 0);
         update_log(user_command);
-        printf("\033[33mComando enviado...\n", user_command);
-
+        
+        recv(clientSocket, output, 1024, 0);
         SEND_OR_RECEIVE = true;
+        update_log(output);
+        
+        printf("\033[33m%s", output);
 
-        // ADICIONAR COMO ENVIAR COMANDO PRA REDE AQUI
+        bzero(output, 1024);
+        bzero(user_command, 1024);
     }
-
     return 0;
 }
