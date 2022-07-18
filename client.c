@@ -108,7 +108,7 @@ void test_if_options_passed(int argc, char* argv[]) {
 int main(int argc, char* argv[]) {
     test_if_options_passed(argc, argv);
     
-    printf("\n\033[31mUsing following configurations:\033[0m\n\t"
+    printf("\n\033[34mUsing following configurations:\n\t"
            "PORT: %d\n\t"
            "HOST: %s\n\t"
            "COMPRESSING: %s\n\t"
@@ -149,12 +149,14 @@ int main(int argc, char* argv[]) {
 
         send(clientSocket, user_command, command_size, 0);
         update_log(user_command);
+	    printf("\033[34m[+]Command Sent Successfully.\n");
         
         recv(clientSocket, output, 1024, 0);
         SEND_OR_RECEIVE = true;
         update_log(output);
         
-        printf("\033[33m%s", output);
+        printf("\033[33m%s\n", output);
+	    printf("\033[34m[+]Command Received Successfully.\n");
 
         bzero(output, 1024);
         bzero(user_command, 1024);

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
@@ -19,7 +20,7 @@ int main() {
 	socklen_t addr_size;
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	printf("[+]Server Socket Created Successfully.\n");
+	printf("\033[34m[+]Server Socket Created Successfully.\n");
 	memset(&serverAddr, '\0', sizeof(serverAddr));
 
 	serverAddr.sin_family = AF_INET;
@@ -27,13 +28,13 @@ int main() {
 	serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
 	bind(sockfd, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
-	printf("[+]Bind to Port number %d.\n", PORT);
+	printf("[+]Bind to Port Number %d.\n", PORT);
 
     listen(sockfd, 5);
     printf("[+]Listening...\n");
 
     newSocket = accept(sockfd, (struct sockaddr*)&newAddr, &addr_size);
-    printf("[+]Connection with client was established.\n");
+    printf("[+]Connection with Client was Established.\n\033[0m");
     
     char command[1024];
     char output[1024];
@@ -42,31 +43,41 @@ int main() {
         recv(newSocket, command, 1024, 0);
 
         if (strcmp(command, "") == 0) {
-            printf("[+]Client disconnected.\n");
+            printf("\033[34m[+]Client Disconnected.\n");
             break;
         }
 
-        char* tmp;
+        char tmp[1024];
         strcpy(tmp, command);
 
-        printf("[+]Received command: %s\n", tmp);
+        printf("\033[34m[+]Received Command: \033[32m%s\n", tmp);
 
         FILE* pipe;
 
-        pipe = popen(tmp, "r");
-
-        if (pipe == NULL) {
-            printf("Unable to open process.\n");
+        if ((pipe = popen(tmp, "r")) == NULL) {
+            fprintf(stderr, "\033[31m[+]Unable to Open Pipe.\n");
             return 1;
         }
-        fgets(output, 1024, pipe);
+
+        while (fgets(output, 1024, pipe)) {
+            if (output[strspn(output, " ")] == '\n') continue;
+        }
+        
+        output[strcspn(output, "\n")] = 0;
+        printf("\033[34m[+]Ouput: \033[33m%s\n", output);
+
+        if (strcmp(output, "") == 0) {
+            printf("\033[31m[+]Something Went Wrong.\n");
+            bzero(output, 1024);
+            strcpy(output, "Output was either blank or command doesn't exist. Please, retry!");
+        }
+
         pclose(pipe);
 
-        printf("[+]Ouput: %s\n", output);
-
         send(newSocket, output, strlen(output), 0);
-        printf("[+]Sent desired output.\n");
+        printf("\033[34m[+]Sent Desired Output.\n");
 
+        bzero(tmp, 1024);
         bzero(output, 1024);
         bzero(command, 1024);
     }
