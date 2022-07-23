@@ -1,13 +1,8 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include "error_handling.h"
 
 #define BUFFER_SIZE 4096
-
-void error_output(char* error_message) {
-    fprintf(stderr, "\033[31m[+]%s.\n", error_message);
-    exit(1);
-}
 
 void command_output(char* command, char* output) {
     printf("%s\n", command);

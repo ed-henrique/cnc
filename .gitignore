@@ -2,10 +2,10 @@
 bin/
 
 # Logs
-test.txt
+*.txt
 
 # Tests
-test.c
+test*.c
 
 # IDE Folders
 .vscode

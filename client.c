@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <sys/types.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -54,7 +53,20 @@ void save_log_as_file(char* log_new_name) {
 
     fp = fopen(log_name, "w");
 
-    if (fp != NULL) fprintf(fp, "[%s] LOG WAS CREATED\n", time_str);
+    if (fp != NULL) {
+        fprintf(fp, "[%s] LOG WAS CREATED USING FOLLOWING CONFIGURATIONS:\n\t"
+            "PORT: %d\n\t"
+            "HOST: %s\n\t"
+            "COMPRESSING: %s\n\t"
+            "SAVING LOGS: %s\n\t"
+            "LOG NAME: %s\n\n",
+            time_str,
+            PORT,
+            HOST,
+            COMPRESS ? "Yes" : "No",
+            LOG_SAVE ? "Yes" : "No",
+            LOG_NAME);
+    }
 
     fclose(fp);
 }
@@ -70,8 +82,8 @@ void update_log(char* command) {
     time_str[strlen(time_str) - 1] = '\0';
 
     if (fp != NULL) {
-        if (!SEND_OR_RECEIVE) fprintf(fp, "[%s] SENT # BYTES: %s\n", time_str, command);
-        else fprintf(fp, "[%s] RECEIVED # BYTES: %s\n", time_str, command);
+        if (!SEND_OR_RECEIVE) fprintf(fp, "[%s] SENT # BYTES:\n%s\n", time_str, command);
+        else fprintf(fp, "[%s] RECEIVED # BYTES:\n%s\n", time_str, command);
     }
 
     fclose(fp);
