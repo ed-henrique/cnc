@@ -1,4 +1,3 @@
-#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,10 +6,10 @@
 #include "client_fn/io_related.h"
 #include "client_fn/log_related.h"
 #include "client_fn/socket_related.h"
-#include "client_fn/error_handling.h"
 #include "client_fn/options_related.h"
+#include "general_fn/error_handling.h"
 
-#define BUFFER_SIZE 4096
+#define BUFFER_SIZE 16384
 
 int PORT = 4444; // Set as default
 
@@ -28,13 +27,13 @@ int main(int argc, char* argv[]) {
     int socket = connect_socket(PORT, HOST);
     printf("[+]Connected to Server.\n\033[0m");
 
+    char output[BUFFER_SIZE];
+    char user_command[BUFFER_SIZE];
+
     while (1) {
         SEND_OR_RECEIVE = false;
 
         printf("\033[32m> ");
-
-        char user_command[BUFFER_SIZE];
-	    char output[BUFFER_SIZE];
 
         fflush(stdin);
         fgets(user_command, BUFFER_SIZE, stdin);
@@ -45,7 +44,6 @@ int main(int argc, char* argv[]) {
         if (send(socket, user_command, command_size, 0) == -1) error_output("Could Not Send");
         
         if (LOG_SAVE) update_log(user_command, LOG_NAME, SEND_OR_RECEIVE);
-	    printf("\033[34m[+]Command Sent Successfully.\n");
         
         if (recv(socket, output, BUFFER_SIZE, 0) == -1) error_output("Could Not Receive");
         
@@ -54,7 +52,6 @@ int main(int argc, char* argv[]) {
         
         fflush(stdout);
         printf("\033[33m%s\n", output);
-	    printf("\033[34m[+]Command Received Successfully.\n");
 
         bzero(output, BUFFER_SIZE);
         bzero(user_command, BUFFER_SIZE);

@@ -1,10 +1,8 @@
 #include <stdio.h>
 #include <string.h>
-#include "error_handling.h"
+#include "../general_fn/error_handling.h"
 
-#define BUFFER_SIZE 4096
-
-void command_output(char* command, char* output) {
+void command_output(char* command, char* output, int BUFFER_SIZE) {
     printf("%s\n", command);
 
     FILE* pipe = popen(command, "r");
@@ -21,7 +19,7 @@ void command_output(char* command, char* output) {
     printf("\033[34m[+]Ouput:\n\033[33m%s\n", output);
 
     if (strcmp(output, "") == 0) {
-        printf("\033[31m[+]Something Went Wrong.\n");
+        printf("\033[31m[+]Something Went Wrong When Executing The Command.\n");
         bzero(output, BUFFER_SIZE);
         strcpy(output, "Output was either blank or command doesn't exist. Please, retry!");
     }

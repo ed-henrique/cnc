@@ -4,7 +4,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include "error_handling.h"
+#include "../general_fn/error_handling.h"
 
 int change_port(char* new_port) {
     int str_size = strlen(new_port) - 7;

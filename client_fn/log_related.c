@@ -56,8 +56,8 @@ void update_log(char* command, char* LOG_NAME, bool SEND_OR_RECEIVE) {
     FILE* fp;
     
     if ((fp = fopen(LOG_NAME, "a")) != NULL) {
-        if (!SEND_OR_RECEIVE) fprintf(fp, "[%s] SENT # BYTES:\n%s\n", time_str, command);
-        else fprintf(fp, "[%s] RECEIVED # BYTES:\n%s\n", time_str, command);
+        if (!SEND_OR_RECEIVE) fprintf(fp, "[%s] SENT %ld BYTES:\n%s\n", time_str, strlen(command) *sizeof(char), command);
+        else fprintf(fp, "[%s] RECEIVED %ld BYTES:\n%s\n", time_str, strlen(command) *sizeof(char), command);
     }
 
     fclose(fp);

@@ -1,11 +1,11 @@
 # Binaries
 bin/
 
+# Tests
+test/
+
 # Logs
 *.txt
-
-# Tests
-test*.c
 
 # IDE Folders
 .vscode

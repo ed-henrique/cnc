@@ -1,1 +1,1 @@
-void command_output(char*, char*);
+void command_output(char*, char*, int);
