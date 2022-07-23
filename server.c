@@ -6,11 +6,11 @@
 #include "server_fn/error_handling.h"
 
 #define BUFFER_SIZE 4096
-
+#define HOST "127.0.0.1"
 #define PORT 4444
 
 int main() {
-    int socket = connect_socket("127.0.0.1", PORT);
+    int socket = connect_socket(HOST, PORT);
     printf("[+]Connection with Client was Established.\n\033[0m");
     
     char command[BUFFER_SIZE];
