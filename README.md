@@ -18,6 +18,7 @@ Made by [Eduardo Henrique](https://github.com/ed-henrique), [Rosialdo Vidinho](h
 
 - [Goals](#goals)
 - [Problems Encountered](#problems-encountered)
+- [Limitations](#limitations)
 - [Demo](#demo)
 - [Presentation](#presentation)
 - [References](#references)
@@ -54,6 +55,14 @@ Possible Solutions:
 
 2. **Can only read either first or last line from pipe output;**
     - The solution was to change a line to line approach using fgets() to a read the file as a whole approach using fread().
+
+---
+
+## Limitations
+
+- Can't use interactive terminal commands (anything using sudo, htop, etc.).
+
+---
 
 ## Demo
 
