@@ -1,1 +1,1 @@
-void test_if_options_passed(int, char*[], char**, int*, char**, int*, int*);
+void test_if_options_passed_client(int, char*[], char**, int*, char**, int*, int*);

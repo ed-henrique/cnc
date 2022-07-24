@@ -6,7 +6,7 @@
 #include <netinet/in.h>
 #include "../general_fn/error_handling.h"
 
-int change_port(char* new_port) {
+int change_port_client(char* new_port) {
     int str_size = strlen(new_port) - 7;
 
     char port[str_size + 1];
@@ -28,7 +28,7 @@ char* change_host(char* new_host) {
     return host;
 }
 
-int connect_socket(int PORT, char* HOST) {
+int connect_socket_client(int PORT, char* HOST) {
     int clientSocket;
 	struct sockaddr_in serverAddr;
 

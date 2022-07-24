@@ -1,0 +1,1 @@
+void test_if_options_passed_server(int, char*[], int*);

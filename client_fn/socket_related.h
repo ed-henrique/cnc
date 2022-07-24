@@ -1,3 +1,3 @@
-int change_port(char*);
+int change_port_client(char*);
 char* change_host(char*);
-int connect_socket(int, char*);
+int connect_socket_client(int, char*);

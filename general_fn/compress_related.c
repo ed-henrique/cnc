@@ -26,9 +26,9 @@ char* uncompress_buffer(char* buffer, ulong original_size, ulong compressed_buff
     int test = uncompress(output, &original_size, buffer, compressed_buffer_size);
 
     if (test == Z_OK) return output;
-    else if (test == Z_BUF_ERROR) error_output("Could Not Compress Because Buffer Is Too Small");
-    else if (test == Z_DATA_ERROR) error_output("Could Not Compress Because Data Is Incomplete Or Corrupted");
-    else error_output("Could Not Compress");
+    else if (test == Z_BUF_ERROR) error_output("Could Not Uncompress Because Buffer Is Too Small");
+    else if (test == Z_DATA_ERROR) error_output("Could Not Uncompress Because Data Is Incomplete Or Corrupted");
+    else error_output("Could Not Uncompress");
 
     return output;
 }
