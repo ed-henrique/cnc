@@ -2,9 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 
-char* create_log(char* log_new_name, int PORT, char* HOST, bool COMPRESS, bool LOG_SAVE) {
+char* create_log(char* log_new_name, int PORT, char* HOST, int COMPRESS, int LOG_SAVE) {
     int str_size = strlen(log_new_name) - 2;
 
 
@@ -47,7 +46,7 @@ char* create_log(char* log_new_name, int PORT, char* HOST, bool COMPRESS, bool L
     return LOG_NAME;
 }
 
-void update_log(char* command, char* LOG_NAME, bool SEND_OR_RECEIVE) {
+void update_log(char* command, char* LOG_NAME, int SEND_OR_RECEIVE) {
     time_t raw_time = time(NULL);
     char* time_str = ctime(&raw_time);
     

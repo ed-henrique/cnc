@@ -1,0 +1,1 @@
+char* ulong_to_str(ulong number);

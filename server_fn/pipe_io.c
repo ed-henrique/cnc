@@ -23,5 +23,4 @@ void command_output(char* command, char* output, int BUFFER_SIZE) {
         bzero(output, BUFFER_SIZE);
         strcpy(output, "Output was either blank or command doesn't exist. Please, retry!");
     }
-
 }

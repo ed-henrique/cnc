@@ -1,7 +1,5 @@
-
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 
 void print_help(char* argv[]) {
     printf("\nClient-side script to interact with server terminal!\n\n\t"
@@ -17,7 +15,7 @@ void print_help(char* argv[]) {
     exit(0);
 }
 
-void print_config(int PORT, char* HOST, bool COMPRESS, bool LOG_SAVE, char* LOG_NAME) {
+void print_config(int PORT, char* HOST, int COMPRESS, int LOG_SAVE, char* LOG_NAME) {
     printf("\n\033[34mUsing following configurations:\n\t"
         "PORT: %d\n\t"
         "HOST: %s\n\t"
