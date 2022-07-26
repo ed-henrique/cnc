@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
             ulong output_size = strlen(output) * sizeof(char) + 1;
             ulong output_byte_size = compressBound(output_size);
 
-            char* output_compressed = compress_buffer(output);
+            char* output_compressed = compress_buffer(output, output_size, output_byte_size);
 
             if (send(socket, &output_size, sizeof(ulong), 0) == -1) error_output("Could Not Send");
             if (send(socket, &output_byte_size, sizeof(ulong), 0) == -1) error_output("Could Not Send");

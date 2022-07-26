@@ -2,7 +2,7 @@
 bin/
 
 # Tests
-test/
+tests/
 
 # Logs
 *.txt

@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
             ulong command_size = strlen(user_command) * sizeof(char) + 1;
             ulong command_byte_size = compressBound(command_size);
 
-            char* user_command_compressed = compress_buffer(user_command);
+            char* user_command_compressed = compress_buffer(user_command, command_size, command_byte_size);
 
             if (send(socket, &command_size, sizeof(ulong), 0) == -1) error_output("Could Not Send");
             if (send(socket, &command_byte_size, sizeof(ulong), 0) == -1) error_output("Could Not Send");
