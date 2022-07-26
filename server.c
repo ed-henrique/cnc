@@ -5,8 +5,8 @@
 #include <sys/socket.h>
 #include "server_fn/pipe_io.h"
 #include "server_fn/socket_related.h"
-#include "general_fn/error_handling.h"
 #include "server_fn/options_related.h"
+#include "general_fn/error_handling.h"
 #include "general_fn/compress_related.h"
 #include "general_fn/conversion_related.h"
 

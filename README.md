@@ -27,17 +27,23 @@ Made by [Eduardo Henrique](https://github.com/ed-henrique), [Rosialdo Vidinho](h
 
 ## Goals
 
-- Log buffer before and after compression
+✅ means done.
+
+🚧 means doing.
+
+❌ means won't do.
+
 - Stop both server and client if an EOF (^D) is found
 - Process kills (^C) sent by the client on the server's side
-- Use multi buffer system for better memory allocation
 - 🚧 Support more than one client during runtime
 - 🚧 Use fork, pipe and execl to pass commands from server
 - ✅ Support --log
 - ✅ Support --host
+- ✅ Log buffer before and after compression
 - ✅ Support --port for both server and client
 - ✅ Pass input from client to server through socket
 - ✅ Use zlib to compress input from client and output from server (--compress)
+- ❌ Use multi buffer system for better memory allocation
 
 ---
 
@@ -46,10 +52,12 @@ Made by [Eduardo Henrique](https://github.com/ed-henrique), [Rosialdo Vidinho](h
 ### Problems:
 
 1. **Using popen() instead of forking;**
+2. **Killing terminal process using ^C**
 
 Possible Solutions:
 
 1. [Read Data From Pipe in C](https://zditect.com/guide/c/pipe-in-c.html);
+1. Implement Problem 1 solution;
 
 ### Solved Problems:
 

@@ -1,13 +1,15 @@
 #include <zlib.h>
+#include <wait.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 #include <string.h>
 #include <sys/socket.h>
 #include "client_fn/io_related.h"
 #include "client_fn/log_related.h"
 #include "client_fn/socket_related.h"
-#include "general_fn/error_handling.h"
 #include "client_fn/options_related.h"
+#include "general_fn/error_handling.h"
 #include "general_fn/compress_related.h"
 #include "general_fn/conversion_related.h"
 
@@ -55,7 +57,7 @@ int main(int argc, char* argv[]) {
             if (send(socket, &command_byte_size, sizeof(ulong), 0) == -1) error_output("Could Not Send");
             if (send(socket, user_command_compressed, command_byte_size, 0) == -1) error_output("Could Not Send");
 
-            if (LOG_SAVE) update_log(user_command_compressed, LOG_NAME, SEND_OR_RECEIVE);
+            if (LOG_SAVE) update_log_compressed(user_command, user_command_compressed, LOG_NAME, SEND_OR_RECEIVE);
 
             ulong output_size;
             ulong output_byte_size;
@@ -66,12 +68,12 @@ int main(int argc, char* argv[]) {
             char* tmp = (char*)malloc(output_byte_size * sizeof(char));
 
             if (recv(socket, tmp, output_byte_size, 0) == -1) error_output("Could Not Send");
-        
-            SEND_OR_RECEIVE = 1;
-            if (LOG_SAVE) update_log(tmp, LOG_NAME, SEND_OR_RECEIVE);
 
             char* output_uncompressed = uncompress_buffer(tmp, output_size, output_byte_size);
             
+            SEND_OR_RECEIVE = 1;
+            if (LOG_SAVE) update_log_compressed(output_uncompressed, tmp, LOG_NAME, SEND_OR_RECEIVE);
+
             fflush(stdout);
             printf("\033[33m%s\n", output_uncompressed);
 

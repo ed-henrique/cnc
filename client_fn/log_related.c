@@ -61,3 +61,27 @@ void update_log(char* command, char* LOG_NAME, int SEND_OR_RECEIVE) {
 
     fclose(fp);
 }
+
+void update_log_compressed(char* command, char* compressed_command, char* LOG_NAME, int SEND_OR_RECEIVE) {
+    time_t raw_time = time(NULL);
+    char* time_str = ctime(&raw_time);
+    
+    time_str[strlen(time_str) - 1] = '\0';
+
+    FILE* fp;
+    
+    if ((fp = fopen(LOG_NAME, "a")) != NULL) {
+        if (!SEND_OR_RECEIVE) {
+            fprintf(fp, "[%s] SENT %ld BYTES:\n", time_str, strlen(command) * sizeof(char));
+            fprintf(fp, "COMMAND: %s\n", command);
+            fprintf(fp, "COMPRESSED COMMAND: %s\n", compressed_command);
+        }
+        else {
+            fprintf(fp, "[%s] RECEIVED %ld BYTES:\n", time_str, strlen(command) * sizeof(char));
+            fprintf(fp, "OUTPUT:\n%s\n", command);
+            fprintf(fp, "COMPRESSED OUTPUT:\n%s\n", compressed_command);
+        }
+    }
+
+    fclose(fp);
+}

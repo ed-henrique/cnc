@@ -45,5 +45,6 @@ int connect_socket_server(char* host, int port) {
     newSocket = accept(sockfd, (struct sockaddr*)&newAddr, &addr_size);
 
     if (newSocket == -1) error_output("Could Not Establish Connection");
+    
     return newSocket;
 }
