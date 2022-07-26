@@ -3,10 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
-#include "server_fn/pipe_io.h"
+//#include "server_fn/pipe_io.h"
 #include "server_fn/socket_related.h"
 #include "server_fn/options_related.h"
 #include "general_fn/error_handling.h"
+#include "server_fn/pipe_io_with_fork.h"
 #include "general_fn/compress_related.h"
 #include "general_fn/conversion_related.h"
 
@@ -46,7 +47,7 @@ int main(int argc, char* argv[]) {
                 break;
             }
 
-            command_output(tmp, output, BUFFER_SIZE);
+            command_output_with_fork(tmp, output, BUFFER_SIZE);
             
             ulong output_size = strlen(output) * sizeof(char) + 1;
             ulong output_byte_size = compressBound(output_size);
@@ -76,7 +77,7 @@ int main(int argc, char* argv[]) {
 
             printf("\033[34m[+]Received Command: \033[32m%s\n", tmp);
 
-            command_output(tmp, output, BUFFER_SIZE);
+            command_output_with_fork(tmp, output, BUFFER_SIZE);
 
             if (send(socket, output, strlen(output), 0) == -1) error_output("Could Not Send");
             

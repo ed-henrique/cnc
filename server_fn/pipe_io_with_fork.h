@@ -1,0 +1,1 @@
+void command_output_with_fork(char*, char*, int);

@@ -5,8 +5,9 @@ client:
 	client_fn/socket_related.c general_fn/compress_related.c general_fn/conversion_related.c -lz -o bin/client
 
 server:
-	gcc -Wall server.c server_fn/pipe_io.c server_fn/socket_related.c general_fn/error_handling.c general_fn/compress_related.c \
+	gcc -Wall server.c server_fn/pipe_io_with_fork.c server_fn/socket_related.c general_fn/error_handling.c general_fn/compress_related.c \
 	general_fn/conversion_related.c server_fn/options_related.c -lz -o bin/server
 
 clean:
 	rm -f bin/client bin/server
+	rm -rf vscode
