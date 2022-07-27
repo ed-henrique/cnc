@@ -1,21 +1,20 @@
 #include <zlib.h>
-//#include <wait.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
-#include <unistd.h>
+//#include <unistd.h>
 #include <pthread.h>
-//#include <sys/types.h>
-#include <sys/socket.h>
-#include "../client_fn/io_related.h"
-#include "../client_fn/log_related.h"
-#include "../client_fn/socket_related.h"
-#include "../client_fn/options_related.h"
-#include "../general_fn/error_handling.h"
-#include "../general_fn/compress_related.h"
+//#include <sys/socket.h>
+#include "client_fn/io_related.h"
+#include "client_fn/log_related.h"
+#include "client_fn/socket_related.h"
+#include "client_fn/options_related.h"
+#include "general_fn/error_handling.h"
+#include "general_fn/compress_related.h"
 
 #define BUFFER_SIZE 16384
+#define LEN 32
 
 int PORT = 4444; // Set as default
 
@@ -38,17 +37,16 @@ void send_msg_handler() {
 
     while(1) {
   	    printf("\033[32m> ");
-        fgets(user_command, BUFFER_SIZE, stdin);
-        user_command[strcspn(user_command, "\n")] = 0;
 
-        if (strcmp(user_command, "^D") == 0) {
+        if (fgets(user_command, BUFFER_SIZE, stdin) == NULL) {
             flag = 1;
 			break;
-        } else {
-            if (send(socket_connection, user_command, strlen(user_command), 0) == -1) error_output("Could Not Send");
-            SEND_OR_RECEIVE = 0;
-            if (LOG_SAVE) update_log(user_command, LOG_NAME, SEND_OR_RECEIVE);
         }
+        
+        user_command[strcspn(user_command, "\n")] = 0;
+        if (send(socket_connection, user_command, strlen(user_command), 0) == -1) error_output("Could Not Send");
+        SEND_OR_RECEIVE = 0;
+        if (LOG_SAVE) update_log(user_command, LOG_NAME, SEND_OR_RECEIVE);
 
 		bzero(user_command, BUFFER_SIZE);
         
@@ -63,13 +61,13 @@ void send_compressed_msg_handler() {
 
     while(1) {
   	    printf("\033[32m> ");
-        fgets(user_command, BUFFER_SIZE, stdin);
-        user_command[strcspn(user_command, "\n")] = 0;
 
-        if (strcmp(user_command, "^D") == 0) {
+        if (fgets(user_command, BUFFER_SIZE, stdin) == NULL) {
             flag = 1;
 			break;
         }
+
+        user_command[strcspn(user_command, "\n")] = 0;
 
         ulong command_size = strlen(user_command) * sizeof(char) + 1;
         ulong command_byte_size = compressBound(command_size);
@@ -85,7 +83,7 @@ void send_compressed_msg_handler() {
 
         bzero(user_command, BUFFER_SIZE);
         bzero(user_command_compressed, command_byte_size);
-        //free(user_command_compressed);
+        free(user_command_compressed);
 
         sleep(1);
     }
@@ -151,7 +149,14 @@ int main(int argc, char **argv){
 	signal(SIGINT, catch_ctrl_c_and_exit);
 
     socket_connection = connect_socket_client(PORT, HOST);
-    printf("[+]Connected to Server.\n\033[0m");
+    printf("[+]Connected to Server.\n");
+
+    char name[LEN];
+    printf("Type your username: ");
+    fgets(name, LEN, stdin);
+    name[strcspn(name, "\n")] = 0;
+
+    if (send(socket_connection, name, LEN, 0) == -1) error_output("Could Not Send Name");;
 
     int compress_signal = send(socket_connection, &COMPRESS, sizeof(int), 0);
     if (compress_signal == -1) error_output("Could Not Send");

@@ -1,20 +1,20 @@
 #include <zlib.h>
 #include <stdio.h>
-#include <errno.h>
+//#include <errno.h>
 #include <signal.h>
 #include <stdlib.h>
-#include <unistd.h>
+//#include <unistd.h>
 #include <string.h>
 #include <pthread.h>
 #include <sys/types.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include "../server_fn/socket_related.h"
-#include "../server_fn/options_related.h"
-#include "../general_fn/error_handling.h"
-#include "../server_fn/pipe_io_with_fork.h"
-#include "../general_fn/compress_related.h"
+#include "server_fn/socket_related.h"
+#include "server_fn/options_related.h"
+#include "general_fn/error_handling.h"
+#include "server_fn/pipe_io_with_fork.h"
+#include "general_fn/compress_related.h"
 
 #define MAX_CLIENTS 5
 #define BUFFER_SIZE 16384
@@ -31,16 +31,12 @@ typedef struct {
 	int sockfd;
 	int uid;
 	int compress;
+	char name[LEN];
 } client_t;
 
 client_t* clients[MAX_CLIENTS];
 
 pthread_mutex_t clients_mutex = PTHREAD_MUTEX_INITIALIZER;
-
-/*void str_overwrite_stdout() {
-    printf("\r%s", "> ");
-    fflush(stdout);
-}*/
 
 void print_client_addr(struct sockaddr_in addr){
         printf("%d.%d.%d.%d",
@@ -82,26 +78,17 @@ void queue_remove(int uid){
 
 /* Handle all communication with the client */
 void *handle_client(void *arg) {
-	//char name[LEN];
 	int leave_flag = 0;
 
 	cli_count++;
 	client_t* cli = (client_t*)arg;
 
-	// Name
-	/*if(recv(cli->sockfd, name, LEN, 0) <= 0 || strlen(name) <  2 || strlen(name) >= -1){
-		printf("Didn't enter the name.\n");
-		leave_flag = 1;
-	} else{
-		strcpy(cli->name, name);
-		sprintf(output, "%s has joined\n", cli->name);
-		printf("%s", output);
-		send_message(output, cli->uid);
-	}
-
-	bzero(output, BUFFER_SIZE);*/
-
+	if (recv(cli->sockfd, cli->name, LEN, 0) == -1) error_output("Could Not Receive");
 	if (recv(cli->sockfd, &cli->compress, sizeof(int), 0) == -1) error_output("Could Not Receive");
+
+	printf("\033[34m%s (", cli->name);
+	print_client_addr(cli->address);
+	printf(") connected to the server.\n");
 
 	char output[BUFFER_SIZE];
 	char command[BUFFER_SIZE];
@@ -132,9 +119,9 @@ void *handle_client(void *arg) {
 
 			char* tmp = uncompress_buffer(command, command_size, command_byte_size);
 
-	        printf("\033[32m> ");
+	        printf("\033[32m> %s (", cli->name);
 			print_client_addr(cli->address);
-			printf(" sent command %s.\n", tmp);
+			printf(") sent command %s.\n", tmp);
 
 			command_output_with_fork(tmp, output, BUFFER_SIZE);
 
@@ -159,16 +146,15 @@ void *handle_client(void *arg) {
             int receive = recv(cli->sockfd, command, BUFFER_SIZE, 0);
 			if (receive == -1) error_output("Could Not Receive Command");
 			else if (receive == 0) {
-				sprintf(output, "%s has left\n", "client");
 				bzero(output, BUFFER_SIZE);
 				bzero(command, BUFFER_SIZE);
 				leave_flag = 1;
 				continue;
 			}
 
-			printf("\033[32m> ");
+			printf("\033[32m> %s (", cli->name);
 			print_client_addr(cli->address);
-			printf(" sent command %s.\n", command);
+			printf(") sent command %s.\n", command);
 
 			command_output_with_fork(command, output, BUFFER_SIZE);
 
@@ -184,6 +170,10 @@ void *handle_client(void *arg) {
 	
 		//pthread_mutex_unlock(&clients_mutex);
 	}
+
+	printf("\033[34m%s (", cli->name);
+	print_client_addr(cli->address);
+	printf(") disconnected from the server.\n");
 
   /* Delete client from queue and yield thread */
 	close(cli->sockfd);
@@ -217,7 +207,7 @@ int main(int argc, char **argv){
 
     if (listen(listenfd, 10) < 0) error_output("Could Not Listen");
 
-	printf("=== WELCOME TO THE CHATROOM ===\n");
+	printf("=== SERVER TERMINAL ===\n");
 
 	while(1){
 		socklen_t clilen = sizeof(cli_addr);

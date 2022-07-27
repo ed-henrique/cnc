@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-char* create_log(char* log_new_name, int PORT, char* HOST, int COMPRESS, int LOG_SAVE) {
+char* create_log(char* log_new_name, int PORT, char* HOST, int COMPRESS) {
     int str_size = strlen(log_new_name) - 2;
 
 
@@ -37,7 +37,7 @@ char* create_log(char* log_new_name, int PORT, char* HOST, int COMPRESS, int LOG
             PORT,
             HOST,
             COMPRESS ? "Yes" : "No",
-            LOG_SAVE ? "Yes" : "No",
+            "Yes",
             LOG_NAME);
     }
 

@@ -33,8 +33,6 @@ Made by [Eduardo Henrique](https://github.com/ed-henrique), [Rosialdo Vidinho](h
 
 ❌ means won't do.
 
-- 🚧 Stop both server and client if an EOF (^D) is found
-- 🚧 Process kills (^C) sent by the client on the server's side
 - ✅ Support --log
 - ✅ Support --host
 - ✅ Log buffer before and after compression
@@ -42,7 +40,9 @@ Made by [Eduardo Henrique](https://github.com/ed-henrique), [Rosialdo Vidinho](h
 - ✅ Support more than one client during runtime
 - ✅ Pass input from client to server through socket
 - ✅ Use fork, pipe and execl to pass commands from server
+- ✅ Stop client and disconnect from server if an EOF (^D) is found
 - ✅ Use zlib to compress input from client and output from server (--compress)
+- ❌ Process kills (^C) sent by the client on the server's side
 - ❌ Use multi buffer system for better memory allocation
 
 ---
@@ -51,11 +51,11 @@ Made by [Eduardo Henrique](https://github.com/ed-henrique), [Rosialdo Vidinho](h
 
 ### Problems:
 
-1. **Killing terminal process using ^C;**
+1. **Passing SIGINT signal from client to server to kill terminal process in pipe;**
 
 Possible Solutions:
 
-1. Get process id of terminal started by execl() to be able to kill it by using SIGINT (^C) signal;
+1. We don't know how to pass the signal, although killing the process is fairly easy;
 
 ### Solved Problems:
 
@@ -73,6 +73,7 @@ Possible Solutions:
 ## Limitations
 
 - Can't use interactive terminal commands (anything using sudo, htop, etc.).
+- There is a limit to the number of clients that the server can support at once.
 
 ---
 
@@ -84,7 +85,7 @@ Possible Solutions:
 
 ## Presentation
 
-### WIP
+[WIP - Canva]()
 
 ---
 
