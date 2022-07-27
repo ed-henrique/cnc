@@ -33,13 +33,13 @@ Made by [Eduardo Henrique](https://github.com/ed-henrique), [Rosialdo Vidinho](h
 
 ❌ means won't do.
 
-- 🚧 Support more than one client during runtime
 - 🚧 Stop both server and client if an EOF (^D) is found
 - 🚧 Process kills (^C) sent by the client on the server's side
 - ✅ Support --log
 - ✅ Support --host
 - ✅ Log buffer before and after compression
 - ✅ Support --port for both server and client
+- ✅ Support more than one client during runtime
 - ✅ Pass input from client to server through socket
 - ✅ Use fork, pipe and execl to pass commands from server
 - ✅ Use zlib to compress input from client and output from server (--compress)

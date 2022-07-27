@@ -1,3 +1,4 @@
+#include <zlib.h>
 #include <stdio.h>
 #include <errno.h>
 #include <signal.h>
@@ -9,40 +10,37 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include "../server_fn/socket_related.h"
+#include "../server_fn/options_related.h"
+#include "../general_fn/error_handling.h"
+#include "../server_fn/pipe_io_with_fork.h"
+#include "../general_fn/compress_related.h"
 
-#define MAX_CLIENTS 100
-#define BUFFER_SZ 2048
+#define MAX_CLIENTS 5
+#define BUFFER_SIZE 16384
+#define HOST "127.0.0.1"
 #define LEN 32
+
+int PORT = 4444;
 
 static _Atomic unsigned int cli_count = 0;
 static int uid = 10;
 
-/* Client structure */
-typedef struct{
+typedef struct {
 	struct sockaddr_in address;
 	int sockfd;
 	int uid;
-	char name[LEN];
+	int compress;
 } client_t;
 
-client_t *clients[MAX_CLIENTS];
+client_t* clients[MAX_CLIENTS];
 
 pthread_mutex_t clients_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-void str_overwrite_stdout() {
+/*void str_overwrite_stdout() {
     printf("\r%s", "> ");
     fflush(stdout);
-}
-
-void str_trim_lf (char* arr, int length) {
-  int i;
-  for (i = 0; i < length; i++) { // trim \n
-    if (arr[i] == '\n') {
-      arr[i] = '\0';
-      break;
-    }
-  }
-}
+}*/
 
 void print_client_addr(struct sockaddr_in addr){
         printf("%d.%d.%d.%d",
@@ -56,8 +54,8 @@ void print_client_addr(struct sockaddr_in addr){
 void queue_add(client_t *cl){
 	pthread_mutex_lock(&clients_mutex);
 
-	for(int i=0; i < MAX_CLIENTS; ++i){
-		if(!clients[i]){
+	for (int i = 0; i < MAX_CLIENTS; ++i) {
+		if (!clients[i]) {
 			clients[i] = cl;
 			break;
 		}
@@ -66,13 +64,13 @@ void queue_add(client_t *cl){
 	pthread_mutex_unlock(&clients_mutex);
 }
 
-/* Remove clients to queue */
+/* Remove clients from queue */
 void queue_remove(int uid){
 	pthread_mutex_lock(&clients_mutex);
 
-	for(int i=0; i < MAX_CLIENTS; ++i){
-		if(clients[i]){
-			if(clients[i]->uid == uid){
+	for (int i=0; i < MAX_CLIENTS; ++i) {
+		if (clients[i]) {
+			if (clients[i]->uid == uid) {
 				clients[i] = NULL;
 				break;
 			}
@@ -82,70 +80,109 @@ void queue_remove(int uid){
 	pthread_mutex_unlock(&clients_mutex);
 }
 
-/* Send message to all clients except sender */
-void send_message(char *s, int uid){
-	pthread_mutex_lock(&clients_mutex);
-
-	for(int i=0; i<MAX_CLIENTS; ++i){
-		if(clients[i]){
-			if(clients[i]->uid != uid){
-				if(write(clients[i]->sockfd, s, strlen(s)) < 0){
-					perror("ERROR: write to descriptor failed");
-					break;
-				}
-			}
-		}
-	}
-
-	pthread_mutex_unlock(&clients_mutex);
-}
-
 /* Handle all communication with the client */
-void *handle_client(void *arg){
-	char buff_out[BUFFER_SZ];
-	char name[LEN];
+void *handle_client(void *arg) {
+	//char name[LEN];
 	int leave_flag = 0;
 
 	cli_count++;
-	client_t *cli = (client_t *)arg;
+	client_t* cli = (client_t*)arg;
 
 	// Name
-	if(recv(cli->sockfd, name, LEN, 0) <= 0 || strlen(name) <  2 || strlen(name) >= -1){
+	/*if(recv(cli->sockfd, name, LEN, 0) <= 0 || strlen(name) <  2 || strlen(name) >= -1){
 		printf("Didn't enter the name.\n");
 		leave_flag = 1;
 	} else{
 		strcpy(cli->name, name);
-		sprintf(buff_out, "%s has joined\n", cli->name);
-		printf("%s", buff_out);
-		send_message(buff_out, cli->uid);
+		sprintf(output, "%s has joined\n", cli->name);
+		printf("%s", output);
+		send_message(output, cli->uid);
 	}
 
-	bzero(buff_out, BUFFER_SZ);
+	bzero(output, BUFFER_SIZE);*/
 
-	while(1){
-		if (leave_flag) {
-			break;
-		}
+	if (recv(cli->sockfd, &cli->compress, sizeof(int), 0) == -1) error_output("Could Not Receive");
 
-		int receive = recv(cli->sockfd, buff_out, BUFFER_SZ, 0);
-		if (receive > 0){
-			if(strlen(buff_out) > 0){
-				send_message(buff_out, cli->uid);
+	char output[BUFFER_SIZE];
+	char command[BUFFER_SIZE];
 
-				str_trim_lf(buff_out, strlen(buff_out));
-				printf("%s -> %s\n", buff_out, cli->name);
+	while (1) {
+		if (leave_flag) break;
+
+		//pthread_mutex_lock(&clients_mutex);
+
+		if (cli->compress) {
+			ulong command_size;
+			ulong command_byte_size;
+
+			int receive = recv(cli->sockfd, &command_size, sizeof(ulong), 0);
+			if (receive == -1) error_output("Could Not Receive Command Size");
+			else if (receive == 0) {
+				sprintf(output, "%s has left\n", "client");
+				bzero(output, BUFFER_SIZE);
+				leave_flag = 1;
+				continue;
 			}
-		} else if (receive == 0 || strcmp(buff_out, "exit") == 0){
-			sprintf(buff_out, "%s has left\n", cli->name);
-			printf("%s", buff_out);
-			send_message(buff_out, cli->uid);
-			leave_flag = 1;
-		} else {
-			printf("ERROR: -1\n");
-			leave_flag = 1;
-		}
+			
+			if (recv(cli->sockfd, &command_byte_size, sizeof(ulong), 0) == -1) error_output("Could Not Receive Command Byte Size");
 
-		bzero(buff_out, BUFFER_SZ);
+			char* command = (char*)malloc(command_byte_size * sizeof(char));
+
+			if (recv(cli->sockfd, command, command_byte_size, 0) == -1) error_output("Could Not Receive Command");
+
+			char* tmp = uncompress_buffer(command, command_size, command_byte_size);
+
+	        printf("\033[32m> ");
+			print_client_addr(cli->address);
+			printf(" sent command %s.\n", tmp);
+
+			command_output_with_fork(tmp, output, BUFFER_SIZE);
+
+			printf("\033[33mOUTPUT:\n%s\033[0m\n", output);
+
+			ulong output_size = strlen(output) * sizeof(char) + 1;
+			ulong output_byte_size = compressBound(output_size);
+
+			char* output_compressed = compress_buffer(output, output_size, output_byte_size);
+		
+			if (send(cli->sockfd, &output_size, sizeof(ulong), 0) == -1) error_output("Could Not Send Output Size");
+			if (send(cli->sockfd, &output_byte_size, sizeof(ulong), 0) == -1) error_output("Could Not Send Output Byte Size");
+			if (send(cli->sockfd, output_compressed, output_byte_size, 0) == -1) error_output("Could Not Send Compressed Output");
+
+			bzero(tmp, command_size);
+			bzero(command, command_byte_size);
+			bzero(output_compressed, output_byte_size);
+			free(output_compressed);
+			free(command);
+			free(tmp);
+		} else {
+            int receive = recv(cli->sockfd, command, BUFFER_SIZE, 0);
+			if (receive == -1) error_output("Could Not Receive Command");
+			else if (receive == 0) {
+				sprintf(output, "%s has left\n", "client");
+				bzero(output, BUFFER_SIZE);
+				bzero(command, BUFFER_SIZE);
+				leave_flag = 1;
+				continue;
+			}
+
+			printf("\033[32m> ");
+			print_client_addr(cli->address);
+			printf(" sent command %s.\n", command);
+
+			command_output_with_fork(command, output, BUFFER_SIZE);
+
+			printf("\033[33mOUTPUT:\n%s\033[0m\n", output);
+
+			if (send(cli->sockfd, output, strlen(output), 0) == -1) error_output("Could Not Send Output");
+		
+			printf("\033[34m[+]Sent Output.\n");
+	
+			bzero(output, BUFFER_SIZE);
+			bzero(command, BUFFER_SIZE);
+		}
+	
+		//pthread_mutex_unlock(&clients_mutex);
 	}
 
   /* Delete client from queue and yield thread */
@@ -159,50 +196,33 @@ void *handle_client(void *arg){
 }
 
 int main(int argc, char **argv){
-	if(argc != 2){
-		printf("Usage: %s <port>\n", argv[0]);
-		return EXIT_FAILURE;
-	}
+	test_if_options_passed_server(argc, argv, &PORT);
 
-	char *ip = "127.0.0.1";
-	int port = atoi(argv[1]);
 	int option = 1;
 	int listenfd = 0, connfd = 0;
     struct sockaddr_in serv_addr;
     struct sockaddr_in cli_addr;
     pthread_t tid;
 
-  /* Socket settings */
     listenfd = socket(AF_INET, SOCK_STREAM, 0);
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = inet_addr(ip);
-    serv_addr.sin_port = htons(port);
+    serv_addr.sin_addr.s_addr = inet_addr(HOST);
+    serv_addr.sin_port = htons(PORT);
 
-  /* Ignore pipe signals */
 	signal(SIGPIPE, SIG_IGN);
 
-	if(setsockopt(listenfd, SOL_SOCKET,(SO_REUSEPORT | SO_REUSEADDR),(char*)&option,sizeof(option)) < 0){
-		perror("ERROR: setsockopt failed");
-        return EXIT_FAILURE;
-	}
+	if(setsockopt(listenfd, SOL_SOCKET,(SO_REUSEPORT | SO_REUSEADDR), (char*)&option,sizeof(option)) < 0) error_output("Could Not Set Socket Options");
 
-	/* Bind */
-    if(bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
-        perror("ERROR: Socket binding failed");
-        return EXIT_FAILURE;
-    }
+    if(bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) error_output("Could Not Bind");
 
-  /* Listen */
-    if (listen(listenfd, 10) < 0) {
-        perror("ERROR: Socket listening failed");
-        return EXIT_FAILURE;
-	}
+    if (listen(listenfd, 10) < 0) error_output("Could Not Listen");
 
 	printf("=== WELCOME TO THE CHATROOM ===\n");
 
 	while(1){
 		socklen_t clilen = sizeof(cli_addr);
 		connfd = accept(listenfd, (struct sockaddr*)&cli_addr, &clilen);
+		if (connfd == -1) error_output("Could Not Connect");
 
 		/* Check if max clients is reached */
 		if((cli_count + 1) == MAX_CLIENTS){
@@ -218,6 +238,7 @@ int main(int argc, char **argv){
 		cli->address = cli_addr;
 		cli->sockfd = connfd;
 		cli->uid = uid++;
+		cli->compress = 0;
 
 		/* Add client to the queue and fork thread */
 		queue_add(cli);
@@ -227,5 +248,7 @@ int main(int argc, char **argv){
 		sleep(1);
 	}
 
-	return EXIT_SUCCESS;
+	pthread_mutex_destroy(&clients_mutex);
+
+	return 0;
 }

@@ -1,5 +1,5 @@
 #include <zlib.h>
-#include <wait.h>
+//#include <wait.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,7 +14,6 @@
 #include "../client_fn/options_related.h"
 #include "../general_fn/error_handling.h"
 #include "../general_fn/compress_related.h"
-#include "../general_fn/conversion_related.h"
 
 #define BUFFER_SIZE 16384
 
@@ -30,11 +29,6 @@ char* HOST = "127.0.0.1"; // Set as default
 volatile sig_atomic_t flag = 0;
 int socket_connection;
 
-void str_overwrite_stdout() {
-    printf("> ");
-    fflush(stdout);
-}
-
 void catch_ctrl_c_and_exit(int sig) {
     flag = 1;
 }
@@ -43,7 +37,7 @@ void send_msg_handler() {
     char user_command[BUFFER_SIZE];
 
     while(1) {
-  	    str_overwrite_stdout();
+  	    printf("\033[32m> ");
         fgets(user_command, BUFFER_SIZE, stdin);
         user_command[strcspn(user_command, "\n")] = 0;
 
@@ -57,6 +51,8 @@ void send_msg_handler() {
         }
 
 		bzero(user_command, BUFFER_SIZE);
+        
+        sleep(1);
     }
 
     catch_ctrl_c_and_exit(SIGINT);
@@ -66,7 +62,7 @@ void send_compressed_msg_handler() {
     char user_command[BUFFER_SIZE];
 
     while(1) {
-  	    str_overwrite_stdout();
+  	    printf("\033[32m> ");
         fgets(user_command, BUFFER_SIZE, stdin);
         user_command[strcspn(user_command, "\n")] = 0;
 
@@ -89,7 +85,9 @@ void send_compressed_msg_handler() {
 
         bzero(user_command, BUFFER_SIZE);
         bzero(user_command_compressed, command_byte_size);
-        free(user_command_compressed);
+        //free(user_command_compressed);
+
+        sleep(1);
     }
 
     catch_ctrl_c_and_exit(SIGINT);
@@ -107,7 +105,6 @@ void recv_msg_handler() {
             if (LOG_SAVE) update_log(output, LOG_NAME, SEND_OR_RECEIVE);
 
             printf("\033[33m%s\n", output);
-            str_overwrite_stdout();
         } else if (receive == 0) break;
         else error_output("Could Not Receive");
 
@@ -118,8 +115,10 @@ void recv_msg_handler() {
 void recv_compressed_msg_handler() {
     while (1) {
         ulong output_size, output_byte_size;
+
         char* tmp = NULL;
         char* output_uncompressed = NULL;
+        
         int receive = recv(socket_connection, &output_size, sizeof(ulong), 0);
         
         if (receive > 0) {
@@ -135,7 +134,6 @@ void recv_compressed_msg_handler() {
             if (LOG_SAVE) update_log_compressed(output_uncompressed, tmp, LOG_NAME, SEND_OR_RECEIVE);
 
             printf("\033[33m%s\n", output_uncompressed);
-            str_overwrite_stdout();
         } else if (receive == 0) break;
         else error_output("Could Not Receive");
         
@@ -172,14 +170,12 @@ int main(int argc, char **argv){
 
 	while (1) {
 		if (flag) {
-			printf("\nBye\n");
+			printf("\n\033[34m[+]Disconnecting...\n");
 			break;
         }
 	}
 
 	close(socket_connection);
-    free(LOG_NAME);
-    free(HOST);
 
 	return 0;
 }
