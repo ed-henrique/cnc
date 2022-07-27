@@ -10,4 +10,3 @@ server:
 
 clean:
 	rm -f bin/client bin/server
-	rm -rf vscode

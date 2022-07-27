@@ -1,35 +1,38 @@
+#include <zlib.h>
+#include <wait.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include <pthread.h>
+//#include <sys/types.h>
+#include <sys/socket.h>
+#include "../client_fn/io_related.h"
+#include "../client_fn/log_related.h"
+#include "../client_fn/socket_related.h"
+#include "../client_fn/options_related.h"
+#include "../general_fn/error_handling.h"
+#include "../general_fn/compress_related.h"
+#include "../general_fn/conversion_related.h"
 
-#define LENGTH 2048
-#define LEN 32
+#define BUFFER_SIZE 16384
 
-// Global variables
+int PORT = 4444; // Set as default
+
+int COMPRESS = 0;
+int LOG_SAVE = 0;
+int SEND_OR_RECEIVE = 0; // 0 for send and 1 for receive
+
+char* LOG_NAME = NULL;
+char* HOST = "127.0.0.1"; // Set as default
+
 volatile sig_atomic_t flag = 0;
-int sockfd = 0;
-char name[LEN];
+int socket_connection;
 
 void str_overwrite_stdout() {
-    printf("%s", "> ");
+    printf("> ");
     fflush(stdout);
-}
-
-void str_trim_lf (char* arr, int length) {
-    int i;
-    for (i = 0; i < length; i++) { // trim \n
-        if (arr[i] == '\n') {
-            arr[i] = '\0';
-            break;
-        }
-    }
 }
 
 void catch_ctrl_c_and_exit(int sig) {
@@ -37,105 +40,146 @@ void catch_ctrl_c_and_exit(int sig) {
 }
 
 void send_msg_handler() {
-    char message[LENGTH] = {};
-	char buffer[LENGTH + LEN] = {};
+    char user_command[BUFFER_SIZE];
 
     while(1) {
   	    str_overwrite_stdout();
-        fgets(message, LENGTH, stdin);
-        str_trim_lf(message, LENGTH);
+        fgets(user_command, BUFFER_SIZE, stdin);
+        user_command[strcspn(user_command, "\n")] = 0;
 
-        if (strcmp(message, "exit") == 0) {
+        if (strcmp(user_command, "^D") == 0) {
+            flag = 1;
 			break;
         } else {
-            sprintf(buffer, "%s: %s\n", name, message);
-            send(sockfd, buffer, strlen(buffer), 0);
+            if (send(socket_connection, user_command, strlen(user_command), 0) == -1) error_output("Could Not Send");
+            SEND_OR_RECEIVE = 0;
+            if (LOG_SAVE) update_log(user_command, LOG_NAME, SEND_OR_RECEIVE);
         }
 
-		bzero(message, LENGTH);
-        bzero(buffer, LENGTH + LEN);
+		bzero(user_command, BUFFER_SIZE);
     }
-    catch_ctrl_c_and_exit(2);
+
+    catch_ctrl_c_and_exit(SIGINT);
 }
 
+void send_compressed_msg_handler() {
+    char user_command[BUFFER_SIZE];
+
+    while(1) {
+  	    str_overwrite_stdout();
+        fgets(user_command, BUFFER_SIZE, stdin);
+        user_command[strcspn(user_command, "\n")] = 0;
+
+        if (strcmp(user_command, "^D") == 0) {
+            flag = 1;
+			break;
+        }
+
+        ulong command_size = strlen(user_command) * sizeof(char) + 1;
+        ulong command_byte_size = compressBound(command_size);
+
+        char* user_command_compressed = compress_buffer(user_command, command_size, command_byte_size);        
+
+        if (send(socket_connection, &command_size, sizeof(ulong), 0) == -1) error_output("Could Not Send");
+        if (send(socket_connection, &command_byte_size, sizeof(ulong), 0) == -1) error_output("Could Not Send");
+        if (send(socket_connection, user_command_compressed, command_byte_size, 0) == -1) error_output("Could Not Send");
+
+        SEND_OR_RECEIVE = 0;
+        if (LOG_SAVE) update_log_compressed(user_command, user_command_compressed, LOG_NAME, SEND_OR_RECEIVE);
+
+        bzero(user_command, BUFFER_SIZE);
+        bzero(user_command_compressed, command_byte_size);
+        free(user_command_compressed);
+    }
+
+    catch_ctrl_c_and_exit(SIGINT);
+}
+
+
 void recv_msg_handler() {
-    char message[LENGTH] = {};
+    char output[BUFFER_SIZE];
+
     while (1) {
-		int receive = recv(sockfd, message, LENGTH, 0);
+		int receive = recv(socket_connection, output, BUFFER_SIZE, 0);
+
         if (receive > 0) {
-        printf("%s", message);
-        str_overwrite_stdout();
-        } else if (receive == 0) {
-		break;
-        } else {
-		    -1;
-	    }
-		memset(message, 0, sizeof(message));
+            SEND_OR_RECEIVE = 1;
+            if (LOG_SAVE) update_log(output, LOG_NAME, SEND_OR_RECEIVE);
+
+            printf("\033[33m%s\n", output);
+            str_overwrite_stdout();
+        } else if (receive == 0) break;
+        else error_output("Could Not Receive");
+
+		bzero(output, BUFFER_SIZE);
+    }
+}
+
+void recv_compressed_msg_handler() {
+    while (1) {
+        ulong output_size, output_byte_size;
+        char* tmp = NULL;
+        char* output_uncompressed = NULL;
+        int receive = recv(socket_connection, &output_size, sizeof(ulong), 0);
+        
+        if (receive > 0) {
+            if (recv(socket_connection, &output_byte_size, sizeof(ulong), 0) == -1) error_output("Could Not Send");
+            
+            tmp = (char*)malloc(output_byte_size * sizeof(char));
+
+            if (recv(socket_connection, tmp, output_byte_size, 0) == -1) error_output("Could Not Send");
+
+            output_uncompressed = uncompress_buffer(tmp, output_size, output_byte_size);
+            
+            SEND_OR_RECEIVE = 1;
+            if (LOG_SAVE) update_log_compressed(output_uncompressed, tmp, LOG_NAME, SEND_OR_RECEIVE);
+
+            printf("\033[33m%s\n", output_uncompressed);
+            str_overwrite_stdout();
+        } else if (receive == 0) break;
+        else error_output("Could Not Receive");
+        
+        bzero(tmp, output_byte_size);
+        bzero(output_uncompressed, output_size);
+        free(output_uncompressed);
+        free(tmp);
     }
 }
 
 int main(int argc, char **argv){
-	if(argc != 2){
-		printf("Usage: %s <port>\n", argv[0]);
-		return EXIT_FAILURE;
-	}
-
-	char *ip = "127.0.0.1";
-	int port = atoi(argv[1]);
+    test_if_options_passed_client(argc, argv, &LOG_NAME, &PORT, &HOST, &COMPRESS, &LOG_SAVE);
+    print_config(PORT, HOST, COMPRESS, LOG_SAVE, LOG_NAME);
 
 	signal(SIGINT, catch_ctrl_c_and_exit);
 
-	printf("Please enter your name: ");
-    fgets(name, LEN, stdin);
-    str_trim_lf(name, strlen(name));
+    socket_connection = connect_socket_client(PORT, HOST);
+    printf("[+]Connected to Server.\n\033[0m");
 
+    int compress_signal = send(socket_connection, &COMPRESS, sizeof(int), 0);
+    if (compress_signal == -1) error_output("Could Not Send");
 
-	if (strlen(name) > LEN || strlen(name) < 2){
-		printf("Name must be less than 30 and more than 2 characters.\n");
-		return EXIT_FAILURE;
-	}
+	printf("=== TERMINAL STARTED ===\n");
 
-	struct sockaddr_in server_addr;
+    pthread_t send_msg_thread, recv_msg_thread;
 
-	/* Socket settings */
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_addr.s_addr = inet_addr(ip);
-    server_addr.sin_port = htons(port);
+    if (COMPRESS) {
+        if(pthread_create(&send_msg_thread, NULL, (void*) send_compressed_msg_handler, NULL) != 0) error_output("Could Not Create Thread");
+        if(pthread_create(&recv_msg_thread, NULL, (void*) recv_compressed_msg_handler, NULL) != 0) error_output("Could Not Create Thread");
+    } else {
+        if(pthread_create(&send_msg_thread, NULL, (void*) send_msg_handler, NULL) != 0) error_output("Could Not Create Thread");
+        if(pthread_create(&recv_msg_thread, NULL, (void*) recv_msg_handler, NULL) != 0) error_output("Could Not Create Thread");
+    }
 
-
-  // Connect to Server
-    int err = connect(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr));
-    if (err == -1) {
-		printf("ERROR: connect\n");
-		return EXIT_FAILURE;
-	}
-
-	// Send name
-	send(sockfd, name, LEN, 0);
-
-	printf("=== WELCOME TO THE CHATROOM ===\n");
-
-	pthread_t send_msg_thread;
-    if(pthread_create(&send_msg_thread, NULL, (void *) send_msg_handler, NULL) != 0){
-		printf("ERROR: pthread\n");
-        return EXIT_FAILURE;
-	}
-
-	pthread_t recv_msg_thread;
-    if(pthread_create(&recv_msg_thread, NULL, (void *) recv_msg_handler, NULL) != 0){
-		printf("ERROR: pthread\n");
-		return EXIT_FAILURE;
-	}
-
-	while (1){
-		if(flag){
+	while (1) {
+		if (flag) {
 			printf("\nBye\n");
 			break;
         }
 	}
 
-	close(sockfd);
+	close(socket_connection);
+    free(LOG_NAME);
+    free(HOST);
 
-	return EXIT_SUCCESS;
+	return 0;
 }
