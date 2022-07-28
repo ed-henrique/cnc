@@ -31,4 +31,10 @@ void command_output_with_fork(char* command, char* output, int BUFFER_SIZE) {
     close(pipe_flag[0]);
 
     if (nbytes != -1) sprintf(output, "%.*s", nbytes, tmp);
+
+    if (output[0] == '\0') {
+        printf("\033[31m[+]Something Went Wrong When Executing The Command.\n");
+        bzero(output, BUFFER_SIZE);
+        strcpy(output, "Output was either blank or command doesn't exist. Please, retry!");
     }
+}
