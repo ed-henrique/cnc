@@ -72,7 +72,8 @@ Possible Solutions:
 
 ## Limitations
 
-- Can't use interactive terminal commands (anything using sudo, htop, etc.).
+- Can't use interactive terminal commands (anything using sudo, htop, etc.);
+- Passing SIGINT signal from client to server to kill terminal process in pipe;
 - There is a limit to the number of clients that the server can support at once.
 
 ---
@@ -85,12 +86,15 @@ Possible Solutions:
 
 ## Presentation
 
-[WIP - Canva]()
+[Slide Presentation]()
+[Canva (with effects)](https://www.canva.com/design/DAFHpdmghg8/GNoinHOJhnPx7lMZw-pLQw/view)
+
+[Report]()
 
 ---
 
 ## References
 
-### WIP
+- [Chatroom in C](https://github.com/nikhilroxtomar/Chatroom-in-C) by [Nikhil Toma r](https://github.com/nikhilroxtomar)
 
 ---
