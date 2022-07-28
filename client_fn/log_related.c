@@ -3,7 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+<<<<<<< HEAD
 char* create_log(char* log_new_name, int PORT, char* HOST, int COMPRESS, int LOG_SAVE) {
+=======
+char* create_log(char* log_new_name, int PORT, char* HOST, int COMPRESS) {
+>>>>>>> dev
     int str_size = strlen(log_new_name) - 2;
 
 
@@ -37,7 +41,11 @@ char* create_log(char* log_new_name, int PORT, char* HOST, int COMPRESS, int LOG
             PORT,
             HOST,
             COMPRESS ? "Yes" : "No",
+<<<<<<< HEAD
             LOG_SAVE ? "Yes" : "No",
+=======
+            "Yes",
+>>>>>>> dev
             LOG_NAME);
     }
 
@@ -60,4 +68,31 @@ void update_log(char* command, char* LOG_NAME, int SEND_OR_RECEIVE) {
     }
 
     fclose(fp);
+<<<<<<< HEAD
+=======
+}
+
+void update_log_compressed(char* command, char* compressed_command, char* LOG_NAME, int SEND_OR_RECEIVE) {
+    time_t raw_time = time(NULL);
+    char* time_str = ctime(&raw_time);
+    
+    time_str[strlen(time_str) - 1] = '\0';
+
+    FILE* fp;
+    
+    if ((fp = fopen(LOG_NAME, "a")) != NULL) {
+        if (!SEND_OR_RECEIVE) {
+            fprintf(fp, "[%s] SENT %ld BYTES:\n", time_str, strlen(command) * sizeof(char));
+            fprintf(fp, "COMMAND: %s\n", command);
+            fprintf(fp, "COMPRESSED COMMAND: %s\n", compressed_command);
+        }
+        else {
+            fprintf(fp, "[%s] RECEIVED %ld BYTES:\n", time_str, strlen(command) * sizeof(char));
+            fprintf(fp, "OUTPUT:\n%s\n", command);
+            fprintf(fp, "COMPRESSED OUTPUT:\n%s\n", compressed_command);
+        }
+    }
+
+    fclose(fp);
+>>>>>>> dev
 }
