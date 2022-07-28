@@ -1,0 +1,128 @@
+[Thu Jul 28 06:37:41 2022] LOG WAS CREATED USING FOLLOWING CONFIGURATIONS:
+	PORT: 4444
+	HOST: 127.0.0.1
+	COMPRESSING: Yes
+	SAVING LOGS: Yes
+	LOG NAME: hello.txt
+
+[Thu Jul 28 06:38:12 2022] SENT 4 BYTES:
+COMMAND: free
+COMPRESSED COMMAND: xœK+JMe
+[Thu Jul 28 06:38:12 2022] RECEIVED 207 BYTES:
+OUTPUT:
+               total        used        free      shared  buff/cache   available
+Mem:         7929944     2613252     1108556     1175248     4208136     3847108
+Swap:        1003516           0     1003516
+
+COMPRESSED OUTPUT:
+xœUŽKÂ0DYç½±cçÃXq·$*R¨¸~Û”VeVÏOÖhªê/Ãk¼cï§.Æ•úVºÅ×cJçFšvñò‘G–:GuÏË^ç†@T-d, =³ý±c$_˜P{0«7žÜü¦n_yï µa°‡ÅúèÕiÉ* 
+[Thu Jul 28 06:38:13 2022] SENT 2 BYTES:
+COMMAND: df
+COMPRESSED COMMAND: xœKIc
+[Thu Jul 28 06:38:13 2022] RECEIVED 627 BYTES:
+OUTPUT:
+Filesystem                 1K-blocks     Used Available Use% Mounted on
+tmpfs                         792996     2024    790972   1% /run
+/dev/mapper/vgkubuntu-root 487886944 51957272 411072892  12% /
+tmpfs                        3964972    53028   3911944   2% /dev/shm
+tmpfs                           5120        4      5116   1% /run/lock
+/dev/nvme0n1p2               1684592   259676   1321032  17% /boot
+/dev/nvme0n1p1                523248     5780    517468   2% /boot/efi
+tmpfs                        3964972        0   3964972   0% /run/qemu
+tmpfs                         792992       60    792932   1% /run/user/1000
+
+COMPRESSED OUTPUT:
+xœQ»nÃ0ìì¯Ð’1IÉzŒ]ºûv£´F,Ûµ,ýûJvŒ6	Ð†yÀïÈ§¦uá+LÎ³ëÂç}Ýöo§°L¯ÁØã\5mU·.;öÒÇnJpß“ŽáFb+mÉZµ´$W¬¦¼fÇø»‚ÜÌ}5näóû)ÖI;îÇ¾Ÿ˜4Úe¥d%ÚRSâIDÐdlR@J
+VÉu+Y Ä¬˜%zÞ>ü?1	¶^nªŸ<_lÍÒÍÞA‡]ßUYfãŒJ«ôB„ rdê”ùRo| iÖVX}h©Ì9O–àîØÜ}–\pÁ9Ð§óñž÷n2
+6Hüz/!ý xøÒ‰‡_
+[Thu Jul 28 06:38:15 2022] SENT 4 BYTES:
+COMMAND: free
+COMPRESSED COMMAND: xœK+JMe
+[Thu Jul 28 06:38:15 2022] RECEIVED 207 BYTES:
+OUTPUT:
+               total        used        free      shared  buff/cache   available
+Mem:         7929944     2612556     1106284     1178196     4211104     3844844
+Swap:        1003516           0     1003516
+
+COMPRESSED OUTPUT:
+xœSP@%ù%‰90Niqj
+ŒV”š
+ag$Ä“JÓÒô““3@â‰e‰™9‰I9©\¾©¹VpãÌ-,-MLÀl#3C#SS30ÛÐÐÀÌÈÂÊ6·0´„ˆ›¥ âÆ&&@Ä\žX
+[Thu Jul 28 06:38:18 2022] SENT 2 BYTES:
+COMMAND: ls
+COMPRESSED COMMAND: xœË)f
+[Thu Jul 28 06:38:18 2022] RECEIVED 107 BYTES:
+OUTPUT:
+bin
+client.c
+client_fn
+general_fn
+hello.txt
+makefile
+old_implementation
+README.md
+server.c
+server_fn
+tests
+
+COMPRESSED OUTPUT:
+xœ-ÌA@0Faë9Lï aiãMÕ‰éTÚ‰8>Âî[¼¼‰•¢0Ô\üá¥Šäå‘ìì2JaÇÂÊ2{N‡ =y0ÎJcßvCïÒLåDynÞ…¡Z¥æ^e&±
+[Thu Jul 28 06:38:24 2022] SENT 8 BYTES:
+COMMAND: neofetch
+COMPRESSED COMMAND: xœËKÍOK-IÎ`
+[Thu Jul 28 06:38:25 2022] RECEIVED 2894 BYTES:
+OUTPUT:
+[?25l[?7l[0m[34m[1m           `.:/ossyyyysso/:.
+        .:oyyyyyyyyyyyyyyyyyyo:`
+      -oyyyyyyyo[37m[0m[1mdMMy[0m[34m[1myyyyyyysyyyyo-
+    -syyyyyyyyyy[37m[0m[1mdMMy[0m[34m[1moyyyy[37m[0m[1mdmMMy[0m[34m[1myyyys-
+   oyyys[37m[0m[1mdMy[0m[34m[1msyyyy[37m[0m[1mdMMMMMMMMMMMMMy[0m[34m[1myyyyyyo
+ `oyyyy[37m[0m[1mdMMMMy[0m[34m[1msyysoooooo[37m[0m[1mdMMMMy[0m[34m[1myyyyyyyyo`
+ oyyyyyy[37m[0m[1mdMMMMy[0m[34m[1myyyyyyyyyyys[37m[0m[1mdMMy[0m[34m[1msssssyyyo
+-yyyyyyyy[37m[0m[1mdMy[0m[34m[1msyyyyyyyyyyyyyys[37m[0m[1mdMMMMMy[0m[34m[1msyyy-
+oyyyysoo[37m[0m[1mdMy[0m[34m[1myyyyyyyyyyyyyyyyyy[37m[0m[1mdMMMMy[0m[34m[1msyyyo
+yyys[37m[0m[1mdMMMMMy[0m[34m[1myyyyyyyyyyyyyyyyyysosyyyyyyyy
+yyys[37m[0m[1mdMMMMMy[0m[34m[1myyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+oyyyyysos[37m[0m[1mdy[0m[34m[1myyyyyyyyyyyyyyyyyy[37m[0m[1mdMMMMy[0m[34m[1msyyyo
+-yyyyyyyy[37m[0m[1mdMy[0m[34m[1msyyyyyyyyyyyyyys[37m[0m[1mdMMMMMy[0m[34m[1msyyy-
+ oyyyyyy[37m[0m[1mdMMMy[0m[34m[1msyyyyyyyyyyys[37m[0m[1mdMMy[0m[34m[1moyyyoyyyo
+ `oyyyy[37m[0m[1mdMMMy[0m[34m[1msyyyoooooo[37m[0m[1mdMMMMy[0m[34m[1moyyyyyyyyo
+   oyyysyyoyyyys[37m[0m[1mdMMMMMMMMMMMy[0m[34m[1myyyyyyyo
+    -syyyyyyyyy[37m[0m[1mdMMMy[0m[34m[1msyyy[37m[0m[1mdMMMy[0m[34m[1msyyyys-
+      -oyyyyyyy[37m[0m[1mdMMy[0m[34m[1myyyyyysosyyyyo-
+        ./oyyyyyyyyyyyyyyyyyyo/.
+           `.:/oosyyyysso/:.`[0m
+[20A[9999999D[43C[0m[1m[34m[1mp1zza[0m@[34m[1mp1zza-notebook[0m 
+[43C[0m--------------------[0m 
+[43C[0m[34m[1mOS[0m[0m:[0m Kubuntu 22.04 LTS x86_64[0m 
+[43C[0m[34m[1mHost[0m[0m:[0m Spin SP313-51N V1.14[0m 
+[43C[0m[34m[1mKernel[0m[0m:[0m 5.15.0-41-generic[0m 
+[43C[0m[34m[1mUptime[0m[0m:[0m 29 mins[0m 
+[43C[0m[34m[1mPackages[0m[0m:[0m 2262 (dpkg), 10 (snap)[0m 
+[43C[0m[34m[1mShell[0m[0m:[0m zsh 5.8.1[0m 
+[43C[0m[34m[1mResolution[0m[0m:[0m 1920x1200[0m 
+[43C[0m[34m[1mDE[0m[0m:[0m Plasma 5.24.4[0m 
+[43C[0m[34m[1mWM[0m[0m:[0m KWin[0m 
+[43C[0m[34m[1mTheme[0m[0m:[0m [Plasma], Breeze [GTK2/3][0m 
+[43C[0m[34m[1mIcons[0m[0m:[0m [Plasma], breeze-dark [GTK2/3][0m 
+[43C[0m[34m[1mTerminal[0m[0m:[0m HyperTerm[0m 
+[43C[0m[34m[1mTerminal Font[0m[0m:[0m Hack[0m 
+[43C[0m[34m[1mCPU[0m[0m:[0m 11th Gen Intel i5-1135G7 (8) @ 4.200GHz[0m 
+[43C[0m[34m[1mGPU[0m[0m:[0m Intel TigerLake-LP GT2 [Iris Xe Graphics][0m 
+[43C[0m[34m[1mMemory[0m[0m:[0m 3701MiB / 7744MiB[0m 
+
+[43C[30m[40m   [31m[41m   [32m[42m   [33m[43m   [34m[44m   [35m[45m   [36m[46m   [37m[47m   [m
+[43C[38;5;8m[48;5;8m   [38;5;9m[48;5;9m   [38;5;10m[48;5;10m   [38;5;11m[48;5;11m   [38;5;12m[48;5;12m   [38;5;13m[48;5;13m   [38;5;14m[48;5;14m   [38;5;15m[48;5;15m   [m
+
+
+[?25h[?7h
+COMPRESSED OUTPUT:
+xœµV[oÚ0Þ3?¶RbÇ!@ÚµÝ jÙÐ ë¤¨)µH‰£8H…_?;7’4mGJ”s|¾ï\l¥m_asÝ¶¯,ñÒý¶mñB>ØË\tç[!œ³Î@kå+Ú€m„æ™ÌW™ µü”ùoãñ¶+óJ"0˜€!ß~f‡.~S
+[Thu Jul 28 06:38:41 2022] SENT 5 BYTES:
+COMMAND: clear
+COMPRESSED COMMAND: xœKÎIM,b
+[Thu Jul 28 06:38:41 2022] RECEIVED 11 BYTES:
+OUTPUT:
+[H[2J[3J
+COMPRESSED OUTPUT:
+xœ“ŽöŽ6ò’Ž6öb
