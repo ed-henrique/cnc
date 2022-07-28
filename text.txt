@@ -1,0 +1,29 @@
+[Thu Jul 28 10:57:17 2022] LOG WAS CREATED USING FOLLOWING CONFIGURATIONS:
+	PORT: 4444
+	HOST: 127.0.0.1
+	COMPRESSING: Yes
+	SAVING LOGS: Yes
+	LOG NAME: text.txt
+
+[Thu Jul 28 10:57:23 2022] SENT 2 BYTES:
+COMMAND: ls
+COMPRESSED COMMAND: xΛ)f
+[Thu Jul 28 10:57:23 2022] RECEIVED 129 BYTES:
+OUTPUT:
+bin
+client.c
+client_fn
+general_fn
+hello.txt
+makefile
+old_implementation
+presentation
+README.md
+server.c
+server_fn
+tests
+text.txt
+
+COMPRESSED OUTPUT:
+x=A
+ƒ0E]Οar‡B]ΊιBª_;t2	Ι ί¤J7χαρή¬4CΝΝ7ψUiƒΆιψHrvΕπΕΚJ²xY›“R.¨ÿσΟitq΅²£΄τ½g¨VΫφ‹'9γ/4©=

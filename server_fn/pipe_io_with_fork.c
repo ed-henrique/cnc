@@ -15,6 +15,7 @@ void command_output_with_fork(char* command, char* output, int BUFFER_SIZE) {
 
     if (pid == 0) {
         close(pipe_flag[0]);
+        dup2(pipe_flag[1], STDERR_FILENO);
         dup2(pipe_flag[1], STDOUT_FILENO);
         close(pipe_flag[1]);
         
@@ -35,6 +36,6 @@ void command_output_with_fork(char* command, char* output, int BUFFER_SIZE) {
     if (output[0] == '\0') {
         printf("\033[31m[+]Something Went Wrong When Executing The Command.\n");
         bzero(output, BUFFER_SIZE);
-        strcpy(output, "Output was either blank or command doesn't exist. Please, retry!");
+        strcpy(output, "Output was either blank or command doesn't exist. Please, retry!\n");
     }
 }
