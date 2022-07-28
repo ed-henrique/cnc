@@ -1,17 +1,11 @@
 #include <stdio.h>
-<<<<<<< HEAD
-=======
 #include <stdlib.h>
->>>>>>> dev
 #include <string.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include "../general_fn/error_handling.h"
 
-<<<<<<< HEAD
-int connect_socket(char* host, int port) {
-=======
 int change_port_server(char* new_port) {
     int str_size = strlen(new_port) - 7;
 
@@ -24,7 +18,6 @@ int change_port_server(char* new_port) {
 }
 
 int connect_socket_server(char* host, int port) {
->>>>>>> dev
     int sockfd;
 	struct sockaddr_in serverAddr;
 
@@ -52,9 +45,6 @@ int connect_socket_server(char* host, int port) {
     newSocket = accept(sockfd, (struct sockaddr*)&newAddr, &addr_size);
 
     if (newSocket == -1) error_output("Could Not Establish Connection");
-<<<<<<< HEAD
-=======
     
->>>>>>> dev
     return newSocket;
 }

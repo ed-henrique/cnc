@@ -3,11 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-<<<<<<< HEAD
-char* create_log(char* log_new_name, int PORT, char* HOST, int COMPRESS, int LOG_SAVE) {
-=======
 char* create_log(char* log_new_name, int PORT, char* HOST, int COMPRESS) {
->>>>>>> dev
     int str_size = strlen(log_new_name) - 2;
 
 
@@ -41,11 +37,7 @@ char* create_log(char* log_new_name, int PORT, char* HOST, int COMPRESS) {
             PORT,
             HOST,
             COMPRESS ? "Yes" : "No",
-<<<<<<< HEAD
-            LOG_SAVE ? "Yes" : "No",
-=======
             "Yes",
->>>>>>> dev
             LOG_NAME);
     }
 
@@ -68,8 +60,6 @@ void update_log(char* command, char* LOG_NAME, int SEND_OR_RECEIVE) {
     }
 
     fclose(fp);
-<<<<<<< HEAD
-=======
 }
 
 void update_log_compressed(char* command, char* compressed_command, char* LOG_NAME, int SEND_OR_RECEIVE) {
@@ -94,5 +84,4 @@ void update_log_compressed(char* command, char* compressed_command, char* LOG_NA
     }
 
     fclose(fp);
->>>>>>> dev
 }

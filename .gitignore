@@ -2,11 +2,7 @@
 bin/
 
 # Tests
-<<<<<<< HEAD
-test/
-=======
 tests/
->>>>>>> dev
 
 # Logs
 *.txt
