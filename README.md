@@ -78,15 +78,10 @@ Possible Solutions:
 
 ---
 
-## Demo
-
-### WIP
-
----
-
 ## Presentation
 
 [Slide Presentation]()
+
 [Canva (with effects)](https://www.canva.com/design/DAFHpdmghg8/GNoinHOJhnPx7lMZw-pLQw/view)
 
 [Report]()
