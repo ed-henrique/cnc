@@ -60,7 +60,7 @@ Made by [Eduardo Henrique](https://github.com/ed-henrique), [Rosialdo Vidinho](h
 
 ## Presentation
 
-- [Report](https://github.com/ed-henrique/EduardoRosialdoVenicius-_FinalProject_OS_RR_2022/blob/main/presentation/Projeto%20Final%20SO.pdf)
+- [Report](./presentation/Projeto%20Final%20SO.pdf)
 - [Canva Presentation (with effects)](https://www.canva.com/design/DAFHpdmghg8/GNoinHOJhnPx7lMZw-pLQw/view)
 
 ## References
